@@ -1,8 +1,16 @@
+--todo
+--add collision
+---add gravity
+--add platforms
+--add camera movement
+--add progression
+
 function decelerate(vel,time)
+    local friction = 1200
     if vel > 3 then
-        return vel - time * 200
+        return vel - time * friction
     elseif vel < -3 then
-        return vel + time * 200
+        return vel + time * friction
     else
         return 0
     end
@@ -22,7 +30,7 @@ end
 function love.update(time)
     local moving = false
     local speed = 800
-    if love.keyboard.isDown("up") then
+    if love.keyboard.isDown("up") then      
         playerYV = playerYV + time*speed
         moving = true
     end
@@ -31,7 +39,7 @@ function love.update(time)
         moving = true
     end
     if love.keyboard.isDown("right") then
-        playerXV = playerXV + time*speed
+        playerXV = playerXV + time*speed            
         moving = true
     end
     if love.keyboard.isDown("left") then
