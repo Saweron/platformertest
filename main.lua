@@ -28,7 +28,8 @@ end
 
 function resolveCollision(px,py,pw,ph,pxv,pyv,cx,cy,cw,ch)
     --fix corners
-    --cleanup unnessecary commments
+        --todo optimize collision
+    --todo split collision into new file
     updatedPlayer = {x=px,y=py,xv=playerXV,yv=playerYV}
     local newX = px+pxv
     local newY = py+pyv
@@ -70,52 +71,7 @@ function resolveCollision(px,py,pw,ph,pxv,pyv,cx,cy,cw,ch)
             updatedPlayer.y = cy - ph
             updatedPlayer.yv = 0
         end
-    else
-        print("not")
     end
-
-    
-    -- is vertically colliding?
-
-
-    -- if px+pw > cx and px < cx+cw then
-    --     if py > cy+ch then
-    --         side=1
-    --         print("up")
-    --     else
-    --         side=2
-    --         print("down")
-    --     end
-    -- elseif py+ph > cy and py < cy+ch then
-    --     if px > cx+cw then
-    --         side=4
-    --         print("right")
-    --     else
-    --         side=3
-    --         print("left")
-    --     end
-    -- end
-    
-    -- if isColliding(px,py,10,10,cx,cy,cw,ch) then
-    --     if side==1 then
-    --         --moving up
-    --         updatedPlayer.y = cy - ph
-    --         updatedPlayer.yv = 0
-    --     elseif side==2 then
-    --         -- moving down
-    --         updatedPlayer.y = cy + ch
-    --         updatedPlayer.yv = 0
-    --     elseif side ==3 then
-    --         --moving left
-    --         updatedPlayer.x = cx + cw
-    --         updatedPlayer.xv = 0
-    --     else
-    --         --moving right
-    --         updatedPlayer.x = cx - pw
-    --         updatedPlayer.xv = 0
-    --     end
-    -- end
-  --  is horizontally colliding?
     return updatedPlayer
 end
 
@@ -156,29 +112,11 @@ function love.update(time)
         moving = true
     end
 
-
-    --movement
-    -- playerX = playerX + time * playerXV
-    -- playerY = playerY + time * playerYV
-
-    --deceleration
     if not moving then
         playerYV = decelerate(playerYV,time)
         playerXV = decelerate(playerXV,time) 
     end
-    --todo optimize collision
-    --todo split collision into new file
-    -- if isColliding(playerX,playerY,10,10,200,200,200,200) then
-    --     if playerYV > 0 then
-    --         --moving up
-    --         playerY = 200 - 10
-    --         playerYV = 0
-    --     else
-    --         -- moving down
-    --         playerY = 200 + 200
-    --         playerYV = 0
-    --     end
-    -- end
+
     positionPlayer(resolveCollision(playerX,playerY,10,10,time*playerXV,time*playerYV,50,50,200,200))
 end
 
