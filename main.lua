@@ -27,19 +27,95 @@ function isColliding(x,y,w,h,cx,cy,cw,ch)
 end
 
 function resolveCollision(px,py,pw,ph,pxv,pyv,cx,cy,cw,ch)
-    print("doing a thing")
-    updatedPlayer = {x=px,y=py,xv=pxv,yv=pyv}
-    if isColliding(playerX,playerY,10,10,cx,cy,cw,ch) then
+    --fix corners
+    --cleanup unnessecary commments
+    updatedPlayer = {x=px,y=py,xv=playerXV,yv=playerYV}
+    local newX = px+pxv
+    local newY = py+pyv
+
+    local function isCollidingOffset(oX,oY)
+        return isColliding(px+oX,py+oY,pw,ph,cx,cy,cw,ch)
+    end
+    updatedPlayer.x = newX
+    updatedPlayer.y = newY
+
+    --determine side 1U 2D 3L 4R
+    local side=0
+    if px+pw > cx and px < cx+cw then
         if pyv > 0 then
-            --moving up
-            updatedPlayer.y = cy - ph
-            updatedPlayer.yv = 0
+            side=1
         else
-            -- moving down
-            updatedPlayer.y = cy + ch
-            updatedPlayer.yv = 0
+            side=2
+        end
+    elseif py+ph > cy and py < cy+ch then
+        if pxv > 0 then
+            side=4
+        else
+            side=3
         end
     end
+
+    if isColliding(newX,newY,pw,ph,cx,cy,cw,ch) then
+        print("colliding")
+        if side == 4 then
+            updatedPlayer.x = cx - pw
+            updatedPlayer.xv = 0
+        elseif side == 3 then
+            updatedPlayer.x = cx + cw
+            updatedPlayer.xv = 0
+        elseif side == 2 then
+            updatedPlayer.y = cy + ch
+            updatedPlayer.yv = 0
+        else
+            updatedPlayer.y = cy - ph
+            updatedPlayer.yv = 0
+        end
+    else
+        print("not")
+    end
+
+    
+    -- is vertically colliding?
+
+
+    -- if px+pw > cx and px < cx+cw then
+    --     if py > cy+ch then
+    --         side=1
+    --         print("up")
+    --     else
+    --         side=2
+    --         print("down")
+    --     end
+    -- elseif py+ph > cy and py < cy+ch then
+    --     if px > cx+cw then
+    --         side=4
+    --         print("right")
+    --     else
+    --         side=3
+    --         print("left")
+    --     end
+    -- end
+    
+    -- if isColliding(px,py,10,10,cx,cy,cw,ch) then
+    --     if side==1 then
+    --         --moving up
+    --         updatedPlayer.y = cy - ph
+    --         updatedPlayer.yv = 0
+    --     elseif side==2 then
+    --         -- moving down
+    --         updatedPlayer.y = cy + ch
+    --         updatedPlayer.yv = 0
+    --     elseif side ==3 then
+    --         --moving left
+    --         updatedPlayer.x = cx + cw
+    --         updatedPlayer.xv = 0
+    --     else
+    --         --moving right
+    --         updatedPlayer.x = cx - pw
+    --         updatedPlayer.xv = 0
+    --     end
+    -- end
+  --  is horizontally colliding?
     return updatedPlayer
 end
 
@@ -82,8 +158,8 @@ function love.update(time)
 
 
     --movement
-    playerX = playerX + time * playerXV
-    playerY = playerY + time * playerYV
+    -- playerX = playerX + time * playerXV
+    -- playerY = playerY + time * playerYV
 
     --deceleration
     if not moving then
@@ -103,8 +179,7 @@ function love.update(time)
     --         playerYV = 0
     --     end
     -- end
-    positionPlayer(resolveCollision(playerX,playerY,0,10,playerXV,playerYV,50,50,200,200))
-    -- print(isColliding(playerX,playerY,10,10,200,200,200,200))
+    positionPlayer(resolveCollision(playerX,playerY,10,10,time*playerXV,time*playerYV,50,50,200,200))
 end
 
 function love.draw()
