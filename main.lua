@@ -17,12 +17,20 @@ function decelerate(vel,time)
     end
 end
 
-
+--fix corners
+--fix too narrow collision
 function isColliding(x,y,w,h,cx,cy,cw,ch)
-    if x > cx and x < cx+cw 
-    and y > cy and y < cy+ch
-    or x+w > cx and x+w < cx+cw
-    and y+h > cy and y+h < cy+ch then return true end
+    local function testPoint(tx,ty)
+        if tx > cx and tx < cx+cw and ty > cy and ty < cy+ch then
+            return true
+        end
+        return false
+    end
+    -- if x > cx and x < cx+cw 
+    -- and y > cy and y < cy+ch
+    -- or x+w > cx and x+w < cx+cw
+    -- and y+h > cy and y+h < cy+ch then return true end
+    if testPoint(x,y) or testPoint(x+w,y) or testPoint(x+w,y+h) or testPoint(x,y+h) then return true end
     return false
 end
 
