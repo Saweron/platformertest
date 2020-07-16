@@ -1,7 +1,7 @@
 --todo
 --add collision detection //
 --add actual collision//
--- add several platforms
+-- add several platforms//
 ---add gravity
 --add platforms
 --add camera movement
@@ -32,7 +32,7 @@ function isColliding(x,y,w,h,cx,cy,cw,ch)
     return false
 end
 
-function resolveCollision(px,py,pw,ph,pxv,pyv,cx,cy,cw,ch)
+function resolveCollision(px,py,pw,ph,pxv,pyv,platforms)
     updatedPlayer = {x=px,y=py,xv=playerXV,yv=playerYV}
     local newX = px+pxv
     local newY = py+pyv
@@ -41,27 +41,34 @@ function resolveCollision(px,py,pw,ph,pxv,pyv,cx,cy,cw,ch)
     updatedPlayer.y = newY
 
     --determine side 1U 2D 3L 4R
-    local side=0
-    if px+pw > cx and px < cx+cw then
-        if pyv > 0 then side=1 else side=2 end
-    elseif py+ph > cy and py < cy+ch then
-        if pxv > 0 then side=4 else side=3 end
-    end
-
-    if isColliding(newX,newY,pw,ph,cx,cy,cw,ch) then
-        print("colliding")
-        if side == 4 then
-            updatedPlayer.x = cx - pw
-            updatedPlayer.xv = 0
-        elseif side == 3 then
-            updatedPlayer.x = cx + cw
-            updatedPlayer.xv = 0
-        elseif side == 2 then
-            updatedPlayer.y = cy + ch
-            updatedPlayer.yv = 0
-        else
-            updatedPlayer.y = cy - ph
-            updatedPlayer.yv = 0
+    for i, p in ipairs(platforms) do
+        local cx = p[1]
+        local cy = p[2]
+        local cw = p[3]
+        local ch = p[4]
+        local side=0
+        if px+pw > cx and px < cx+cw then
+            if pyv > 0 then side=1 else side=2 end
+        elseif py+ph > cy and py < cy+ch then
+            if pxv > 0 then side=4 else side=3 end
+        end
+        if isColliding(newX,newY,pw,ph,cx,cy,cw,ch) then
+            print("colliding")
+            if side == 4 then
+                updatedPlayer.x = cx - pw
+                updatedPlayer.xv = 0
+            elseif side == 3 then
+                updatedPlayer.x = cx + cw
+                updatedPlayer.xv = 0
+            elseif side == 2 then
+                updatedPlayer.y = cy + ch
+                updatedPlayer.yv = 0
+            else
+                updatedPlayer.y = cy - ph
+                updatedPlayer.yv = 0
+            end
+            newX = updatedPlayer.x
+            newY = updatedPlayer.y
         end
     end
     return updatedPlayer
@@ -124,7 +131,7 @@ function love.update(time)
         playerXV = decelerate(playerXV,time) 
     end
 
-    positionPlayer(resolveCollision(playerX,playerY,10,10,time*playerXV,time*playerYV,50,50,200,200))
+    positionPlayer(resolveCollision(playerX,playerY,10,10,time*playerXV,time*playerYV,world))
 end
 
 function love.draw()
