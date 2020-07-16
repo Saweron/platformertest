@@ -1,6 +1,7 @@
 --todo
 --add collision detection //
---add actual collision
+--add actual collision//
+-- add several platforms
 ---add gravity
 --add platforms
 --add camera movement
@@ -17,8 +18,9 @@ function decelerate(vel,time)
     end
 end
 
---fix corners
 --fix too narrow collision
+--todo split collision into new file
+
 function isColliding(x,y,w,h,cx,cy,cw,ch)
     local function testPoint(tx,ty)
         if tx > cx and tx < cx+cw and ty > cy and ty < cy+ch then
@@ -26,42 +28,24 @@ function isColliding(x,y,w,h,cx,cy,cw,ch)
         end
         return false
     end
-    -- if x > cx and x < cx+cw 
-    -- and y > cy and y < cy+ch
-    -- or x+w > cx and x+w < cx+cw
-    -- and y+h > cy and y+h < cy+ch then return true end
     if testPoint(x,y) or testPoint(x+w,y) or testPoint(x+w,y+h) or testPoint(x,y+h) then return true end
     return false
 end
 
 function resolveCollision(px,py,pw,ph,pxv,pyv,cx,cy,cw,ch)
-    --fix corners
-        --todo optimize collision
-    --todo split collision into new file
     updatedPlayer = {x=px,y=py,xv=playerXV,yv=playerYV}
     local newX = px+pxv
     local newY = py+pyv
-
-    local function isCollidingOffset(oX,oY)
-        return isColliding(px+oX,py+oY,pw,ph,cx,cy,cw,ch)
-    end
+    
     updatedPlayer.x = newX
     updatedPlayer.y = newY
 
     --determine side 1U 2D 3L 4R
     local side=0
     if px+pw > cx and px < cx+cw then
-        if pyv > 0 then
-            side=1
-        else
-            side=2
-        end
+        if pyv > 0 then side=1 else side=2 end
     elseif py+ph > cy and py < cy+ch then
-        if pxv > 0 then
-            side=4
-        else
-            side=3
-        end
+        if pxv > 0 then side=4 else side=3 end
     end
 
     if isColliding(newX,newY,pw,ph,cx,cy,cw,ch) then
@@ -90,11 +74,26 @@ function positionPlayer(pos)
     playerYV = pos.yv
 end
 
+function generatePlatforms()
+    local platforms = {{0,0,50,50},{-200,-200,50,50},{50,50,200,200}}
+    return platforms
+end
+
+function renderPlatforms(platforms)
+    for i, p in ipairs(platforms) do 
+        if p[1] and p[2] and p[3] and p[4] then
+            love.graphics.rectangle("fill",p[1],p[2],p[3],p[4])
+        end
+    end
+end
+
 function love.load()
     playerX = 0 
     playerY = 0
     playerXV = 0
     playerYV = 0
+
+    world = generatePlatforms()
 
     x = require("functions.hello")
     print(x.returnathing())
@@ -137,5 +136,7 @@ function love.draw()
     love.graphics.print("Hello World", 400, 300)
     love.graphics.rectangle("fill",playerX,playerY,10,10)
 
-    love.graphics.rectangle("fill",50,50,200,200)
+    -- love.graphics.rectangle("fill",50,50,200,200)
+
+    renderPlatforms(world)
 end
